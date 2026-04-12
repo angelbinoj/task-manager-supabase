@@ -20,20 +20,25 @@ function AddTask () {
 
  const handleAddTask = async() => {
 
-  const { data, error } = await supabase
-  .from('tasks')
-  .insert([
-    { title, description},
-  ])
-  .select()
+  try {  
 
-  if(error){
-        console.log("error inserting tasks",error); 
-      }else{
-        console.log('Task Added Successfully',data);
-      }
+    const { data ,error} = await supabase
+    .from('tasks')
+    .insert([
+      { title, description},
+    ])
+    .select()
 
-  navigate("/");
+     if (error) {
+    throw error;
+  }
+    navigate("/");
+    console.log('Task Added Successfully',data);
+  } catch (error) {
+    console.log("error inserting tasks",error); 
+    
+  }
+
 };
 
   return (

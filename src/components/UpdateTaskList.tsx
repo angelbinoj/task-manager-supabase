@@ -29,18 +29,21 @@ export default function UpdateTaskList({ task }: Props) {
 
   const handleUpdate = async() => {
 
-    const { data, error } = await supabase
-  .from('tasks')
-  .update({ title, description ,status})
-  .eq('id', task.id)
-  .select()
+    try {
+      const { data, error } = await supabase
+    .from('tasks')
+    .update({ title, description ,status})
+    .eq('id', task.id)
+    .select()
 
-   if(error){
+     if (error) {
+    throw error;
+  }
+    console.log('Task updated successfully',data);     
+    } catch (error) {     
       console.log("error updating task",error); 
-    }else{
-      console.log('Task updated successfully',data);
-      
     }
+
     window.location.reload();
   }
 

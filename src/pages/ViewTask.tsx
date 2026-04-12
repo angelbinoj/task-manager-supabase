@@ -18,41 +18,66 @@ import { useNavigate, useParams } from "react-router-dom"
 export default function ViewTask() {
   const navigate=useNavigate()
   const [task,setTask]=useState<Task | null>(null);
+  const [loading, setLoading] = useState(true);
   const {id } =useParams<{ id: string | undefined }>();
   
   const fetchTask =async()=>{ 
-    const { data , error } = await supabase
-      .from('tasks')
-      .select('*')
-      .eq("id", id)
-      .single()
+    try {
+      setLoading(true);
+      const { data ,error} = await supabase
+        .from('tasks')
+        .select('*')
+        .eq("id", id)
+        .single()
 
-      if(error){
-        console.log("error fetching tasks",error); 
-      }else{
+
+         if (error) {
+    throw error;
+  }
+      
         setTask(data);
+        setLoading(false);
         console.log('Task fetched successfully');
-        
-      }
+    } catch (error) {
+      console.log("error fetching tasks",error); 
+      
+    }
+
   }
 
   const handleDelete=async()=>{
-    const { error } = await supabase
-  .from('tasks')
-  .delete()
-  .eq('id', id)
 
-   if(error){
-        console.log("error deleting tasks",error); 
-      }else{
-        navigate('/')
-      }
+    try {
+      const { error} = await supabase
+    .from('tasks')
+    .delete()
+    .eq('id', id)
+    
+    if (error) {
+    throw error;
+  }
+    navigate('/')
+      
+    } catch (error){
+      console.log("error deleting tasks",error); 
+      
+    }
   }
   
   useEffect(() => {
     fetchTask()
   }, [])
-if (!task) return <p className="text-center text-blue-600 font-bold font-serif mt-32">Loading...</p>;
+  
+  if (loading) {
+    return (
+      <div className="flex justify-center items-center gap-1 min-h-screen">
+      <p className="text-blue-600 font-semibold text-lg">Loading...</p>
+      <div className="w-8 h-8 border-4 border-blue-600 border-t-transparent rounded-full animate-spin"></div>
+    </div>
+  );
+}
+if (!task) return <p className="text-center text-blue-600 font-bold font-serif mt-32">Task not found!</p>;
+
 
   return (
     <div className="flex flex-col justify-center items-center min-h-screen bg-gray-200">

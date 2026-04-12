@@ -9,19 +9,28 @@ import { useNavigate } from "react-router-dom";
 
 function ListTasks() {
 const [tasks,setTasks]=useState<Task[]>([]);
+  const [loading, setLoading] = useState(true);
 
 const fetchTasks =async()=>{
 
-  const { data , error } = await supabase
-    .from('tasks')
-    .select('*')
+  try {
+       setLoading(true);
+    const { data ,error} = await supabase
+      .from('tasks')
+      .select('*')
 
-    if(error){
-      console.log("error fetching tasks",error); 
-    }else{
+       if (error) {
+    throw error;
+  }
+
       setTasks(data as Task[] || []);
+         setLoading(false);
        console.log('Tasks fetched successfully');
-    }
+
+  } catch (error) {
+    console.log("error fetching tasks",error); 
+    
+  }
 }
 
 useEffect(() => {
@@ -34,6 +43,15 @@ useEffect(() => {
 
   const handleClick = (id: number |string) => {
   navigate(`/view/${id}`);
+}
+
+ if (loading) {
+    return (
+      <div className="flex justify-center items-center gap-1 min-h-screen">
+      <p className="text-blue-600 font-semibold text-lg">Fetching task...</p>
+      <div className="w-8 h-8 border-4 border-blue-600 border-t-transparent rounded-full animate-spin"></div>
+    </div>
+  );
 }
 
   return (
