@@ -71,7 +71,7 @@ export default function ViewTask() {
   if (loading) {
     return (
       <div className="flex justify-center items-center gap-1 min-h-screen">
-      <p className="text-blue-600 font-semibold text-lg">Loading...</p>
+      <p className="text-blue-600 font-semibold text-lg">Fetching task...</p>
       <div className="w-8 h-8 border-4 border-blue-600 border-t-transparent rounded-full animate-spin"></div>
     </div>
   );

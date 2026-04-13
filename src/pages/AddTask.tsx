@@ -17,29 +17,40 @@ function AddTask () {
   const [title, setTitle] = useState<string>("");
   const [description, setDescription] = useState<string>("");
    const navigate=useNavigate();
+   
 
- const handleAddTask = async() => {
+     
+const handleAddTask = async () => {
+  try {
 
-  try {  
+    const { data: { user } } = await supabase.auth.getUser();
 
-    const { data ,error} = await supabase
-    .from('tasks')
-    .insert([
-      { title, description},
-    ])
-    .select()
+    if (!user) {
+      console.log("User not logged in");
+      return;
+    }
 
-     if (error) {
-    throw error;
-  }
+    const { data, error } = await supabase
+      .from('tasks')
+      .insert([
+        {
+          title,
+          description,
+          user_id: user.id, 
+        },
+      ])
+      .select();
+
+    if (error) throw error;
+
+    console.log("Task Added Successfully", data);
     navigate("/");
-    console.log('Task Added Successfully',data);
-  } catch (error) {
-    console.log("error inserting tasks",error); 
-    
-  }
 
+  } catch (error) {
+    console.log("error inserting tasks", error);
+  }
 };
+
 
   return (
     <div className="flex justify-center items-center min-h-screen bg-gray-100">
