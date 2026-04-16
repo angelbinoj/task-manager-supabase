@@ -17,6 +17,7 @@ import { Input } from "@/components/ui/input"
 import { useState } from "react"
 import type { Task } from "@/types/Task"
 import { supabase } from "@/lib/supabase"
+import { toast } from "sonner"
 
 type Props = {
   task: Task
@@ -30,14 +31,18 @@ export default function UpdateTaskList({ task }: Props) {
   const handleUpdate = async() => {
 
     try {
-      const { data, error } = await supabase
-    .from('tasks')
-    .update({ title, description ,status})
-    .eq('id', task.id)
-    .select()
-
+      if (!title || !description ) {
+    toast.error("All fields are required");
+    return;
+  }
+      const { data, error } = await supabase.rpc('update_task', {
+  tid: task.id,
+  t: title,
+  d: description,
+  s: status
+});
      if (error) {
-    throw error;
+    toast.error(error.message || "Something went wrong");
   }
     console.log('Task updated successfully',data);     
     } catch (error) {     

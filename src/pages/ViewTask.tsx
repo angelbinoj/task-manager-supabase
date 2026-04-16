@@ -13,6 +13,7 @@ import { supabase } from "@/lib/supabase";
 import type { Task } from "@/types/Task";
 import { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom"
+import { toast } from "sonner";
 
 
 export default function ViewTask() {
@@ -32,7 +33,9 @@ export default function ViewTask() {
 
 
          if (error) {
-    throw error;
+    console.log(error);
+    toast.error("Access Denied")
+    
   }
       
         setTask(data);

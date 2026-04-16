@@ -11,7 +11,7 @@ import { toast } from "sonner";
 
 
 
-function ListTasks() {
+function ListCompletedTasks() {
   const [tasks, setTasks] = useState<Task[]>([]);
   const [loading, setLoading] = useState(true);
   const [user, setUser] = useState<User | null>(null);
@@ -46,7 +46,7 @@ useEffect(() => {
         return;
       }
       
-        const { data, error } = await supabase.rpc('get_user_tasks', {
+        const { data, error } = await supabase.rpc('get_completed_tasks', {
 uid: user.id
 });
 
@@ -99,14 +99,9 @@ uid: user.id
 
       {/* Table Container */}
       <div className="max-w-3xl mx-auto bg-blue-600 rounded-xl shadow-md p-4">
-        <div className="flex justify-between items-center">
-        <Button className="text-blue-600" variant="outline" onClick={() => navigate('/add')}>
-          Add Task <span className=" text-2xl">+</span>
+        <Button className="text-blue-600" variant="outline" onClick={() => navigate('/')}>
+          Back to list
         </Button>
-        <Button className="text-blue-600" variant="outline" onClick={() => navigate('/cmpltd')}>
-          View Completed Tasks 
-        </Button>
-        </div>
         <table className="w-full text-white">
 
           {/* Table Head */}
@@ -144,4 +139,4 @@ uid: user.id
   );
 }
 
-export default ListTasks;
+export default ListCompletedTasks;

@@ -9,6 +9,7 @@ import { supabase } from "./lib/supabase"
 import { useEffect, useState } from "react"
 import type { User } from "@supabase/supabase-js"
 import { Toaster } from "sonner"
+import ListCompletedTasks from "./pages/CompletedTask"
 
 function App() {
 
@@ -41,7 +42,8 @@ function App() {
   return (
     <>
       <Routes>
-        <Route path='/' index element={user ? <ViewTaskList /> : <Navigate to="/signIn" />} />
+        <Route path='/' index element={user ? <ViewTaskList/> : <Navigate to="/signIn" />}/>
+        <Route path='/cmpltd' index element={user ? <ListCompletedTasks/> : <Navigate to="/signIn" />}/>
         <Route path='add' element={user ? <AddTask /> : <Navigate to="/signIn" />} />
         <Route path='view/:id' element={user ? <ViewTask /> : <Navigate to="/signIn" />} />
         <Route path='/signUp' element={<SignUp />} />

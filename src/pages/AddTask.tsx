@@ -10,6 +10,7 @@ import { Input } from "@/components/ui/input"
 import { useNavigate } from "react-router-dom";
 import { useState } from "react";
 import { supabase } from "@/lib/supabase";
+import { toast } from "sonner";
 
 
 function AddTask () {
@@ -30,20 +31,22 @@ const handleAddTask = async () => {
       return;
     }
 
-    const { data, error } = await supabase
-      .from('tasks')
-      .insert([
-        {
-          title,
-          description,
-          user_id: user.id, 
-        },
-      ])
-      .select();
+    if (!title || !description) {
+    toast.error("All fields are required");
+    return;
+  }
 
-    if (error) throw error;
+    const {  error } = await supabase.rpc('add_task', {
+  t: title,
+  d: description,
+  uid: user?.id
+});
 
-    console.log("Task Added Successfully", data);
+    if (error) {
+      toast.error(error.message);
+    }
+
+    toast.success("Task Added Successfully");
     navigate("/");
 
   } catch (error) {
