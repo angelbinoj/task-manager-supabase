@@ -1,6 +1,6 @@
-
 import { Button } from "@/components/ui/button";
 import { supabase } from "@/lib/supabase";
+import { BsChat } from "react-icons/bs";
 import type { Task } from "@/types/Task";
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
@@ -14,7 +14,8 @@ import { toast } from "sonner";
 function ListTasks() {
   const [tasks, setTasks] = useState<Task[]>([]);
   const [loading, setLoading] = useState(true);
-  const [user, setUser] = useState<User | null>(null);
+  // const [user, setUser] = useState<User | null>(null);
+  const [user, setUser] = useState<any>({});
   const navigate=useNavigate();
 
 
@@ -39,7 +40,14 @@ useEffect(() => {
       setLoading(true);
 
       const { data: { user } } = await supabase.auth.getUser();
-      setUser(user);
+
+                const { data:userData } = await supabase
+                    .from("users")
+                    .select("*")
+                    .eq("id", user?.id)
+                    .single()
+
+                setUser(userData || "");
 
       if (!user) {
         setLoading(false);
@@ -62,6 +70,7 @@ uid: user.id
       setLoading(false);
     }
   };
+
 
   loadData();
 }, []);
@@ -89,10 +98,11 @@ uid: user.id
           ToDoList
         </h1>
         <div className="flex justify-end items-center w-full gap-16 pr-10">
-          <div className="flex gap-2 justify-center items-center">
+          <div onClick={()=>navigate('/update')} className="flex gap-2 justify-center items-center hover:bg-blue-500 rounded-xl p-1">
             <h5 className="text-white font-sm">{user?.email}</h5>
-            <img src={avatar} className="w-9 h-9 rounded-full" />
+            <img src={user?.image_url ? user.image_url : avatar} className="w-9 h-9 rounded-full" />
           </div>
+          <BsChat className="w-8 h-8 text-white hover:text-slate-300" onClick={()=>navigate('/users')}/>
           <Button onClick={()=>logout()} className="bg-red-400 hover:bg-red-500">Logout</Button>
         </div>
       </div>

@@ -20,6 +20,7 @@ export default function ViewTask() {
   const navigate=useNavigate()
   const [task,setTask]=useState<Task | null>(null);
   const [loading, setLoading] = useState(true);
+  const [files, setFiles] = useState<any[]>([]);
   const {id } =useParams<{ id: string | undefined }>();
   
   const fetchTask =async()=>{ 
@@ -66,10 +67,35 @@ export default function ViewTask() {
       
     }
   }
+
+  useEffect(() => {
+  if (!id) return;
+  fetchTask();
+}, [id]);
   
   useEffect(() => {
-    fetchTask()
-  }, [])
+  if (!task?.id) return; 
+  
+  // 🚨 wait until task exists
+
+  const loadFiles = async () => {
+    const { data, error } = await supabase
+      .from("task_files")
+      .select("*")
+      .eq("task_id", task.id);
+
+    if (error) {
+      console.log(error);
+      return;
+    }
+
+    setFiles(data || []);
+    console.log(files);
+    
+  };
+
+  loadFiles();
+}, [task]);
   
   if (loading) {
     return (
@@ -101,7 +127,32 @@ if (!task) return <p className="text-center text-blue-600 font-bold font-serif m
         <FieldLabel className=" mt-4 bg-blue-300 text-green-600 p-1 rounded font-bold" htmlFor="textarea-message">Completed</FieldLabel> : 
         <FieldLabel className=" mt-4 bg-blue-300 text-red-600 p-1 rounded font-bold" htmlFor="textarea-message">Pending</FieldLabel>
         }
-        
+        <div className="mt-4 space-y-2">
+  <h3 className="text-white font-semibold">Attachments</h3>
+  
+{files.length === 0 && (
+  <p className="text-slate-200 italic text-sm">No attachments</p>
+)}
+  {files.map((file) => (
+    <div key={file.id}>
+      {file.file_name.endsWith(".pdf") ? (
+        <a
+          href={file.file_url}
+          target="_blank"
+          className="text-yellow-300 underline"
+        >
+          📄 {file.file_name}
+        </a>
+      ) : (
+        <img
+          src={file.file_url}
+          alt="attachment"
+          className="w-32 rounded"
+        />
+      )}
+    </div>
+  ))}
+</div>
       </CardContent>
       <CardFooter className="flex justify-center gap-2 w-full py-2">
            <UpdateTaskList task={task}/>

@@ -10,6 +10,9 @@ import { useEffect, useState } from "react"
 import type { User } from "@supabase/supabase-js"
 import { Toaster } from "sonner"
 import ListCompletedTasks from "./pages/CompletedTask"
+import Messages from "./components/Messages"
+import UsersList from "./pages/UserList"
+import UpdateProfile from "./components/UpdateProfile"
 
 function App() {
 
@@ -44,6 +47,9 @@ function App() {
       <Routes>
         <Route path='/' index element={user ? <ViewTaskList/> : <Navigate to="/signIn" />}/>
         <Route path='/cmpltd' index element={user ? <ListCompletedTasks/> : <Navigate to="/signIn" />}/>
+        <Route path='/users' index element={user ? <UsersList/> : <Navigate to="/signIn" />}/>
+        <Route path='/update' index element={user ? <UpdateProfile/> : <Navigate to="/signIn" />}/>
+        <Route path='message/:id' index element={user ? <Messages/> : <Navigate to="/signIn" />}/>
         <Route path='add' element={user ? <AddTask /> : <Navigate to="/signIn" />} />
         <Route path='view/:id' element={user ? <ViewTask /> : <Navigate to="/signIn" />} />
         <Route path='/signUp' element={<SignUp />} />
