@@ -55,7 +55,12 @@ function Messages() {
 
   };
 
+
   const handleAddMessage = async () => {
+
+    const { data: { session } } = await supabase.auth.getSession();
+
+console.log(session);
   if (!user || !id || !message.trim()) return;
 
   const { data, error } = await supabase.functions.invoke("send-message", {

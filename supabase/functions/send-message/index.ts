@@ -9,41 +9,55 @@ const corsHeaders = {
 serve(async (req) => {
 
   if (req.method === 'OPTIONS') {
-    return new Response('ok', { headers: corsHeaders })
+    return new Response('ok', { headers: corsHeaders });
   }
 
   try {
-    
     const supabaseClient = createClient(
       Deno.env.get('SUPABASE_URL') ?? '',
       Deno.env.get('SUPABASE_ANON_KEY') ?? '',
-      { global: { headers: { Authorization: req.headers.get('Authorization')! } } }
-    )
-    
-    console.log(supabaseClient);
-    
+      {
+        global: {
+          headers: {
+            Authorization: req.headers.get('Authorization')!,
+          },
+        },
+      }
+    );
+
+    // ✅ Validate user
+    const {
+      data: { user },
+      error: userError,
+    } = await supabaseClient.auth.getUser();
+
+    if (userError || !user) {
+      return new Response("Unauthorized", { status: 401 });
+    }
+
     const { sender_id, receiver_id, content } = await req.json();
 
-    const { data, error } = await supabase
+    // ✅ Use correct client
+    const { data, error } = await supabaseClient
       .from("messages")
       .insert({
         sender_id,
         receiver_id,
-        content
+        content,
       })
       .select();
 
-    if (error) throw error
+    if (error) throw error;
 
     return new Response(JSON.stringify(data), {
       headers: { ...corsHeaders, 'Content-Type': 'application/json' },
       status: 200,
-    })
+    });
 
   } catch (error) {
     return new Response(JSON.stringify({ error: error.message }), {
       headers: { ...corsHeaders, 'Content-Type': 'application/json' },
       status: 400,
-    })
+    });
   }
-})
+});
